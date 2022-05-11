@@ -10,6 +10,7 @@ import numpy as np
 import pymysql
 from sktime.forecasting.arima import AutoARIMA
 from functions import do_train, do_predict, data_aws
+from credentials import endpoint, password, user
 
 os.chdir(os.path.dirname(__file__))
 
@@ -22,7 +23,7 @@ def hello():
 
 @app.route('/api/v1/train', methods=['GET'])
 def train():
-    data = data_aws()
+    data = data_aws(endpoint, password, user)
     do_train(data)
     return 'trained'
     

@@ -28,13 +28,10 @@ def get_data(endpoint, password, user):
                         password = password,
                         cursorclass = pymysql.cursors.DictCursor)
 
-def data_aws():
-    username = "admin"
-    password = "Grupo2AWS"
-    host = "web-users.czjoi0srhr5i.eu-west-3.rds.amazonaws.com"
+def data_aws(endpoint, password, user):
         
-    db = pymysql.connect(host = host,
-                        user = username,
+    db = pymysql.connect(host = endpoint,
+                        user = user,
                         password = password,
                         cursorclass = pymysql.cursors.DictCursor
     )
