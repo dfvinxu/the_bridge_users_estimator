@@ -7,6 +7,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import Lasso
 from sklearn.metrics import mean_absolute_percentage_error
 import numpy as np
+import pymysql
+from sktime.forecasting.arima import AutoARIMA
+from functions import do_train, do_predict, data_aws
 
 os.chdir(os.path.dirname(__file__))
 
@@ -17,36 +20,17 @@ app.config['DEBUG'] = True
 def hello():
     return "THE BRIDGE MARKETING ESTIMATOR"
 
+@app.route('/api/v1/train', methods=['GET'])
+def train():
+    data = data_aws()
+    do_train(data)
+    return 'trained'
+    
 
 @app.route('/api/v1/predict', methods=['GET'])
 def predict():
-
-    model = pickle.load(open('ad_model.pkl','rb'))
-    
-    date = request.args.get('Date', None)
-    users = request.args.get('Users', None)
-
-    if date is None or users is None:
-        return "Args empty, the data are not enough to predict"
-    else:
-        prediction = model.predict([[date,users]])
-    
-    return jsonify({'predictions': prediction[0]})
-
-@app.route('/api/v1/retrain', methods=['PUT'])
-def retrain():
-    data = pd.read_csv('data/users_web.csv', index_col=0)
-
-    X_train, X_test, y_train, y_test = train_test_split(data.drop(columns=['Date']),
-                                                    data['Date'],
-                                                    test_size = 0.20,
-                                                    random_state=42)
-
-    model = Lasso(alpha=6000)
-    model.fit(X_train, y_train)
-
-    pickle.dump(model, open('ad_model.pkl', 'wb'))
-
-    return "Model retrained. New evaluation metric MAPE: " + str(np.sqrt(mean_absolute_percentage_error(y_test, model.predict(X_test))))
+        n_weeks = int(request.args.get('n_weeks', None))
+        do_predict(n_weeks)
+        return 'predictions done'
 
 app.run()
