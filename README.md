@@ -8,6 +8,6 @@ Machine Learning model which predicts the number of users that visit 'The Bridge
 <strong>Class Group Project, Contributors:<br>
 <strong><em>Trabajo de Clase, Contribuyentes:</em></strong>
 
-<strong> Alfonso, David, Hugo, Nicole, Oscar, Paco<br>
+<strong> Alfonso, David, Hugo, Nicole, Oscar, Gonzalo, Paco<br>
 
 ![Webage Image](images/Logo.png?raw=true "logo") 
