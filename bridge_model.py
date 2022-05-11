@@ -129,4 +129,28 @@ def reset():
         con.close()
     return 'user data reset to {}'.format(reset_date)
 
+@app.route('/api/v1/get_table_new_data', methods=['GET'])
+def new_data_table():
+    engine = sqlalchemy.create_engine("mysql+pymysql://{user}:{pw}@{host}/{db}".format(user = user, pw = password, host = endpoint, db = 'users_web_db'))
+    with engine.connect() as con:
+        query = """select * from new_data"""
+        new_data_table = pd.read_sql(query, con=con)
+        new_data_table.columns = new_data_table.columns.str.lower()
+        new_data_table.date = pd.to_datetime(new_data_table.date)
+        con.close()
+    new_data_table.date = new_data_table.date.dt.strftime('%Y-%m-%d')
+    res_json = new_data_table.to_dict(orient = 'records')
+    return jsonify(res_json)
+
+@app.route('/api/v1/get_table_predictions', methods=['GET'])
+def predictions_table():
+    engine = sqlalchemy.create_engine("mysql+pymysql://{user}:{pw}@{host}/{db}".format(user = user, pw = password, host = endpoint, db = 'users_web_db'))
+    with engine.connect() as con:
+        query = """select * from predict_users"""
+        predictions_table = pd.read_sql(query, con=con)
+        con.close()
+    predictions_table.date = predictions_table.date.dt.strftime('%Y-%m-%d')
+    res_json = predictions_table.to_dict(orient = 'records')
+    return jsonify(res_json)
+
 app.run()
