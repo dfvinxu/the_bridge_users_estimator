@@ -6,7 +6,7 @@ from flask_restful import Api, Resource
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 from functions import do_train, do_predict, get_data
-from credentials import endpoint, port, password, user
+from credentials import endpoint, password, user
 
 ########################################################################################
 
@@ -39,7 +39,7 @@ def retrain():
 @app.route('/endpoint/api/update', methods=['PUT'])
 def update_data():
     # connectarse a la db en AWS y guardarla como db
-    db = get_data(endpoint, port, password, user)
+    db = get_data(endpoint, password, user)
     # El objeto cursor es el que ejecutará las queries y devolverá los resultados
     cursor = db.cursor()
     # necesita que el usuario le de los datos nuevos (fecha y num. usuarios)
