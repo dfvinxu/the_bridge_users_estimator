@@ -17,7 +17,7 @@ app.config["DEBUG"] = True
 
 @app.route('/', methods=['GET'])
 def home():
-    return 'Hello'
+    return "THE BRIDGE MARKETING ESTIMATOR"
     # Open the home file
     # with open(os.path.dirname(app.root_path)+'home.md','r') as markdown_file:
     #     # read content 
@@ -30,10 +30,11 @@ def predict():
     predictions = do_predict()
     return "Our predictions for the number of people interacting with The Bridge in the following week: " + predictions
 
-@app.route('/api/retrain', methods=['GET'])
+@app.route('/api/v1/train', methods=['GET'])
 def retrain():
     db = get_data(endpoint, port, password, user)
     do_train(db)
+    return 'The model has been retrained with the new data and saved in a file called autoarima'
 
 @app.route('/endpoint/api/update', methods=['PUT'])
 def update_data():
