@@ -5,7 +5,6 @@ from sktime.forecasting.arima import AutoARIMA
 import pymysql
 
 def do_train(data):
-    """Comprobar el MAPE y hacer retrain con autoarima si el mayor de 0.2"""
     data.columns = data.columns.str.lower()
     data.date = pd.to_datetime(data.date, dayfirst=True)
     data = data.set_index('date')

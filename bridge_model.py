@@ -22,6 +22,7 @@ app.config['DEBUG'] = True
 def hello():
     return "THE BRIDGE MARKETING ESTIMATOR"
 
+
 @app.route('/api/v1/train', methods=['GET'])
 def train():
     data = data_aws(endpoint, password, user)
@@ -47,5 +48,57 @@ def predict():
     pred_table.date = pred_table.date.dt.strftime('%Y-%m-%d')
     preds_json = pred_table.to_dict(orient = 'records')
     return jsonify(preds_json)
+
+@app.route('/api/v1/update', methods=['GET'])
+def update():
+    # nos sacamos todas las tablas de AWS
+    engine = sqlalchemy.create_engine("mysql+pymysql://{user}:{pw}@{host}/{db}".format(user = user, pw = password, host = endpoint, db = 'users_web_db'))
+    with engine.connect() as con:
+        query = """select * from users_web"""
+        users_table = pd.read_sql(query, con=con)
+        users_table.columns = users_table.columns.str.lower()
+        users_table.date = pd.to_datetime(users_table.date)
+        query = """select * from predict_users"""
+        predictions_table = pd.read_sql(query, con=con)
+        query = """select * from new_data"""
+        new_data_table = pd.read_sql(query, con=con)
+        new_data_table.columns = new_data_table.columns.str.lower()
+        new_data_table.date = pd.to_datetime(new_data_table.date)
+        con.close()
+    # sacamos la siguiente fecha de nuestras predicciones
+    next_predicted_date = predictions_table.date.min()
+    # ver si nuestra next_predicted_date esta en new_data_table
+    # significa que tenemos datos de una fecha predicha
+    cond = next_predicted_date in new_data_table.date.values
+    if cond:
+        # nuestra siguiente fecha predicha esta en la tabla de nuevos datos
+        mask = predictions_table.date == next_predicted_date
+        y_pred = predictions_table.loc[mask,'users'].values
+        # y_true lo obtenemos de agrupar los nuevos datos por semana
+        weekly = new_data_table.set_index('date').asfreq('D').groupby(pd.Grouper(freq='W')).sum()
+        y_true = weekly.loc[next_predicted_date].values
+        # calculamos mape
+        mape = mean_absolute_percentage_error(y_true=y_true, y_pred=y_pred)
+        print(mape)
+        # añadimos nuevos datos a la tabla users
+        mask = new_data_table.date <= next_predicted_date
+        users_table = pd.concat([users_table, new_data_table[mask]])
+        # quitamos datos nuevos de new_data_table
+        new_data_table = new_data_table[~mask]
+        # quitamos la ultima prediccion de predictions_table
+        predictions_table = predictions_table[predictions_table.date > next_predicted_date]
+        if mape >= 0.2:
+            do_train(users_table)
+        # push de tablas a AWS
+        with engine.connect() as con:
+            new_data_table.to_sql(name = 'new_data', con=con, if_exists='replace', index=False)
+            users_table.to_sql(name='users_web', con=con, if_exists='replace', index=False)
+            predictions_table.to_sql(name='predict_users', con=con, if_exists='replace', index=False)
+        con.close()
+
+    return 'MAPE: {}'.format(mape) if cond else 'no new data available'
+
+
+
 
 app.run()
