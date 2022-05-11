@@ -153,4 +153,17 @@ def predictions_table():
     res_json = predictions_table.to_dict(orient = 'records')
     return jsonify(res_json)
 
+@app.route('/api/v1/get_table_users', methods=['GET'])
+def users_table():
+    engine = sqlalchemy.create_engine("mysql+pymysql://{user}:{pw}@{host}/{db}".format(user = user, pw = password, host = endpoint, db = 'users_web_db'))
+    with engine.connect() as con:
+        query = """select * from users_web"""
+        users_table = pd.read_sql(query, con=con)
+        users_table.columns = users_table.columns.str.lower()
+        users_table.date = pd.to_datetime(users_table.date)
+        con.close()
+    users_table.date = users_table.date.dt.strftime('%Y-%m-%d')
+    res_json = users_table[-10:].to_dict(orient = 'records')
+    return jsonify(res_json)
+
 app.run()
