@@ -28,13 +28,13 @@ def home():
 @app.route('/api/predict', methods=['GET'])
 def predict():
     predictions = do_predict()
-    return "Our predictions for the number of people interacting with The Bridge in the following week: " + predictions
+    return "Our predictions for the number of people interacting with The Bridge in the following week: " 
 
 @app.route('/api/v1/train', methods=['GET'])
 def retrain():
     db = get_data(endpoint, password, user)
     do_train(db)
-    return 'The model has been retrained with the new data and saved in a file called autoarima'
+    return "The model has been retrained with the new data and saved in a file called autoarima"
 
 @app.route('/endpoint/api/update', methods=['PUT'])
 def update_data():
@@ -50,5 +50,6 @@ def update_data():
     df.to_sql(name='new_users', con=engine, if_exists= 'append', index=False)
     # commit los cambios 
     db.commit()
+    return "The data has been updated"
 
 app.run()
