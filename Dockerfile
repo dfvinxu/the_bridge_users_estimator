@@ -3,5 +3,5 @@ RUN mkdir /app
 WORKDIR /app
 ADD . /app
 RUN pip install -r requirements.txt
-CMD ["python", "application.py"]
+CMD ["python", "bridge_model.py"]
 EXPOSE 5001
