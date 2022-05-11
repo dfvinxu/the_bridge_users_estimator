@@ -1,6 +1,3 @@
-# the_bridge_users_estimator
-
-
 # The Bridge Users Estimator
 
 ![Webage Image](the_bridge_users_estimator/images/TheBridgeWebpage.png?raw=true "LSE: A") 
