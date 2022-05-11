@@ -1,5 +1,4 @@
 # The Bridge Users Estimator API Documentation
-___________________________________________________________
 
 1. Overview
 The Bridge Users Estimator API is a JSON-based OAuth2 API. All requests are made to endpoints beginning: https://
@@ -29,4 +28,8 @@ GET https://
 Retrains the AUTOARIMA after new data has been inputted, the model is then saved in a file called arima.pickle.
 
 GET https://
+
+___________________________________________________________
+
+Contributors: Alfonso, David, Hugo, Nicole, Oscar, Paco
 
