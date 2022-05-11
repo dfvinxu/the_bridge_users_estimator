@@ -1,14 +1,6 @@
 from datetime import date
-from flask import Flask, jsonify, request
+from flask import Flask, request
 import os
-import pickle
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import Lasso
-from sklearn.metrics import mean_absolute_percentage_error
-import numpy as np
-import pymysql
-from sktime.forecasting.arima import AutoARIMA
 from functions import do_train, do_predict, data_aws
 from credentials import endpoint, password, user
 
