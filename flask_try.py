@@ -27,7 +27,8 @@ def home():
 
 @app.route('/api/predict', methods=['GET'])
 def predict():
-    predictions = do_predict()
+    n_weeks = int(request.args.get('n_weeks', None))
+    predictions = do_predict(n_weeks)
     x = predictions.to_json()
     return "Our predictions for the number of people interacting with The Bridge in the following week: " 
 
