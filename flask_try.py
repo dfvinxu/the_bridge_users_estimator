@@ -5,7 +5,7 @@ from flask import Flask, jsonify, request
 from flask_restful import Api, Resource
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
-from funcs import do_train, do_predict, get_data
+from functions import do_train, do_predict, get_data
 from credentials import endpoint, port, password, user
 
 ########################################################################################
