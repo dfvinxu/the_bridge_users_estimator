@@ -32,7 +32,7 @@ def predict():
 
 @app.route('/api/v1/train', methods=['GET'])
 def retrain():
-    db = get_data(endpoint, port, password, user)
+    db = get_data(endpoint, password, user)
     do_train(db)
     return 'The model has been retrained with the new data and saved in a file called autoarima'
 

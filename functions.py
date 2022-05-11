@@ -27,3 +27,31 @@ def get_data(endpoint, password, user):
                         user = user,
                         password = password,
                         cursorclass = pymysql.cursors.DictCursor)
+
+def data_aws():
+    username = "admin"
+    password = "Grupo2AWS"
+    host = "web-users.czjoi0srhr5i.eu-west-3.rds.amazonaws.com"
+        
+    db = pymysql.connect(host = host,
+                        user = username,
+                        password = password,
+                        cursorclass = pymysql.cursors.DictCursor
+    )
+
+    # El objeto cursor es el que ejecutará las queries y devolverá los resultados
+    cursor = db.cursor()
+
+    cursor.connection.commit()
+    use_db = ''' USE users_web_db'''
+    cursor.execute(use_db)
+
+    sql = '''SELECT * FROM users_web'''
+    cursor.execute(sql)
+    mi_tabla = cursor.fetchall()
+
+    data = pd.DataFrame(mi_tabla)
+
+    db.close()
+
+    return data
