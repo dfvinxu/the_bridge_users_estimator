@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import pymysql
 import sqlalchemy
+import pathlib
 from datetime import date
 from flask import Flask, jsonify, request
 from sklearn.model_selection import train_test_split
@@ -12,8 +13,6 @@ from sklearn.metrics import mean_absolute_percentage_error
 from sktime.forecasting.arima import AutoARIMA
 from functions import do_train, do_predict, data_aws
 from credentials import endpoint, password, user
-
-os.chdir(os.path.dirname(__file__))
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
@@ -96,9 +95,39 @@ def update():
             predictions_table.to_sql(name='predict_users', con=con, if_exists='replace', index=False)
         con.close()
 
-    return 'MAPE: {}'.format(mape) if cond else 'no new data available'
+    return 'MAPE: {}'.format(mape) if cond else 'no new data available, next date {}'.format(next_predicted_date)
 
-
-
+@app.route('/api/v1/reset', methods=['GET'])
+def reset():
+    reset_date = '2022-04-17'
+    engine = sqlalchemy.create_engine("mysql+pymysql://{user}:{pw}@{host}/{db}".format(user = user, pw = password, host = endpoint, db = 'users_web_db'))
+    with engine.connect() as con:
+        query = """select * from full_data"""
+        data = pd.read_sql(query, con=con)
+        data.columns = data.columns.str.lower()
+        data.date = pd.to_datetime(data.date)
+        con.close()
+    # nuevos datos > reset date
+    mask = data.date > reset_date
+    nuevos_datos = data[mask]
+    datos = data[~mask]
+    # reiniciar tablas en la base de datos
+    with engine.connect() as con:
+        nuevos_datos.to_sql(name = 'new_data', con=con, if_exists='replace', index=False)
+        datos.to_sql(name='users_web', con=con, if_exists='replace', index=False)
+        con.close()
+    # entrenariamos el modelo
+    do_train(datos)
+    # predeciriamos y actualizariamos predicciones
+    n_weeks = 4
+    predictions = do_predict(n_weeks)
+    predictions.index.names = ['date']
+    pred_table = predictions.reset_index()
+    pred_table.users = pred_table.users.astype(int)
+    # mandamos el dataframe a la nube
+    with engine.connect() as con:
+        pred_table.to_sql(name = 'predict_users', con = con, if_exists='replace', index=False)
+        con.close()
+    return 'data reset to {}'.format(reset_date)
 
 app.run()

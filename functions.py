@@ -12,7 +12,6 @@ def do_train(data):
     arima = AutoARIMA(
         start_p = 1, 
         start_q = 1,
-        maxiter = 100,
         suppress_warnings=True
         )
     arima.fit(weekly)
