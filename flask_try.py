@@ -18,12 +18,6 @@ app.config["DEBUG"] = True
 @app.route('/', methods=['GET'])
 def home():
     return "THE BRIDGE MARKETING ESTIMATOR"
-    # Open the home file
-    # with open(os.path.dirname(app.root_path)+'home.md','r') as markdown_file:
-    #     # read content 
-    #     content = markdown_file.read()
-    #     #convert to HTML
-    #     return markdown.markdown(content)
 
 @app.route('/api/predict', methods=['GET'])
 def predict():
