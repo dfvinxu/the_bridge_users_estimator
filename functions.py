@@ -21,13 +21,6 @@ def do_predict(n_weeks=1):
     predictions = model.predict(fh=list(range(1,n_weeks+1)))
     return predictions
 
-def get_data(endpoint, password, user):
-    """Conectarse a AWS y leer los datos"""
-    db = pymysql.connect(host = endpoint,
-                        user = user,
-                        password = password,
-                        cursorclass = pymysql.cursors.DictCursor)
-
 def data_aws(endpoint, password, user):
         
     db = pymysql.connect(host = endpoint,
