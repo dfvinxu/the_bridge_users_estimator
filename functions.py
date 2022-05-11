@@ -6,8 +6,8 @@ import pymysql
 
 def do_train(data):
     """Comprobar el MAPE y hacer retrain con autoarima si el mayor de 0.2"""
-    data.Date = pd.to_datetime(data.Date, dayfirst=True)
-    data = data.set_index('Date')
+    data.date = pd.to_datetime(data.date, dayfirst=True)
+    data = data.set_index('date')
     weekly = data.groupby(pd.Grouper(freq='W')).sum()
     arima = AutoARIMA(start_p = 1, start_q = 1)
     arima.fit(weekly)
