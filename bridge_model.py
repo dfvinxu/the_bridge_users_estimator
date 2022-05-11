@@ -78,7 +78,6 @@ def update():
         y_true = weekly.loc[next_predicted_date].values
         # calculamos mape
         mape = mean_absolute_percentage_error(y_true=y_true, y_pred=y_pred)
-        print(mape)
         # añadimos nuevos datos a la tabla users
         mask = new_data_table.date <= next_predicted_date
         users_table = pd.concat([users_table, new_data_table[mask]])
@@ -99,7 +98,7 @@ def update():
 
 @app.route('/api/v1/reset', methods=['GET'])
 def reset():
-    reset_date = '2022-04-17'
+    reset_date = '2022-04-03'
     engine = sqlalchemy.create_engine("mysql+pymysql://{user}:{pw}@{host}/{db}".format(user = user, pw = password, host = endpoint, db = 'users_web_db'))
     with engine.connect() as con:
         query = """select * from full_data"""
@@ -128,6 +127,6 @@ def reset():
     with engine.connect() as con:
         pred_table.to_sql(name = 'predict_users', con = con, if_exists='replace', index=False)
         con.close()
-    return 'data reset to {}'.format(reset_date)
+    return 'user data reset to {}'.format(reset_date)
 
 app.run()
