@@ -17,6 +17,7 @@ from credentials import endpoint, password, user
 app = Flask(__name__)
 app.config['DEBUG'] = True
 
+
 @app.route("/", methods=['GET'])
 def hello():
     return "THE BRIDGE MARKETING ESTIMATOR"
@@ -25,7 +26,7 @@ def hello():
 @app.route('/api/v1/train', methods=['GET'])
 def train():
     data = data_aws(endpoint, password, user)
-    do_train(data)
+    do_train(data[-16:])
     return 'trained'
     
 
@@ -47,6 +48,7 @@ def predict():
     pred_table.date = pred_table.date.dt.strftime('%Y-%m-%d')
     preds_json = pred_table.to_dict(orient = 'records')
     return jsonify(preds_json)
+
 
 @app.route('/api/v1/update', methods=['GET'])
 def update():
@@ -96,6 +98,7 @@ def update():
 
     return 'MAPE: {}'.format(mape) if cond else 'no new data available, next date {}'.format(next_predicted_date)
 
+
 @app.route('/api/v1/reset', methods=['GET'])
 def reset():
     reset_date = '2022-04-03'
@@ -129,6 +132,7 @@ def reset():
         con.close()
     return 'user data reset to {}'.format(reset_date)
 
+
 @app.route('/api/v1/get_table_new_data', methods=['GET'])
 def new_data_table():
     engine = sqlalchemy.create_engine("mysql+pymysql://{user}:{pw}@{host}/{db}".format(user = user, pw = password, host = endpoint, db = 'users_web_db'))
@@ -142,6 +146,7 @@ def new_data_table():
     res_json = new_data_table.to_dict(orient = 'records')
     return jsonify(res_json)
 
+
 @app.route('/api/v1/get_table_predictions', methods=['GET'])
 def predictions_table():
     engine = sqlalchemy.create_engine("mysql+pymysql://{user}:{pw}@{host}/{db}".format(user = user, pw = password, host = endpoint, db = 'users_web_db'))
@@ -152,6 +157,7 @@ def predictions_table():
     predictions_table.date = predictions_table.date.dt.strftime('%Y-%m-%d')
     res_json = predictions_table.to_dict(orient = 'records')
     return jsonify(res_json)
+
 
 @app.route('/api/v1/get_table_users', methods=['GET'])
 def users_table():
@@ -166,5 +172,6 @@ def users_table():
     users_table.date = users_table.date.dt.strftime('%Y-%m-%d')
     res_json = users_table[-n_users:].to_dict(orient = 'records')
     return jsonify(res_json)
+
 
 app.run()
